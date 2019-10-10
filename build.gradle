@@ -2,11 +2,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenLocal()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -15,44 +15,71 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenLocal()
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
+group = 'com.edwardstock.android'
+version = '2.2.0'
+
 ext {
-    libraryName = 'CodeScanner'
-    libraryDescription = 'Code scanner library for Android, based on ZXing'
-    libraryVersion = '2.1.0'
-    artifact = 'code-scanner'
-    developerId = 'yuriy-budiyev'
-    developerName = 'Yuriy Budiyev'
-    developerEmail = 'yuriy.budiyev@yandex.ru'
-    publishedGroupId = 'com.budiyev.android'
-    siteUrl = 'https://github.com/yuriy-budiyev/code-scanner'
-    gitUrl = 'https://github.com/yuriy-budiyev/code-scanner.git'
-    bintrayRepo = 'maven'
-    bintrayName = 'code-scanner'
-    licenseName = 'MIT License'
-    allLicenses = ['MIT']
+    buildArtifactName = project.name
+    buildArtifactVersion = version
+    buildArtifactGroup = group
+
+    pomName = "code-scanner"
+    pomUrl = "https://github.com/edwardstock/code-scanner"
+    pomScm = {
+        connection = "scm:git:git://github.com/edwardstock/code-scanner.git"
+        url = pomUrl
+    }
+    pomInceptionYear = "2018"
+    pomContributors = {}
+    pomDescription = "Code scanner library for Android, based on ZXing"
+    pomDevelopers = {
+        developer {
+            id = "yuriy-budiyev"
+            name = "Yuriy Budiyev"
+            email = "yuriy.budiyev@yandex.ru"
+            roles = ["maintainer"]
+            timezone = "Europe/Moscow"
+        }
+        developer {
+            id = "edwardstock"
+            name = "Eduard Maximovich"
+            email = "edwatd.vstock@gmail.com"
+            roles = ["forker"]
+            timezone = "Europe/Moscow"
+        }
+    }
+    pomLicenses = {
+        license {
+            name = "MIT License"
+            url = "https://opensource.org/licenses/MIT"
+            distribution = "repo"
+        }
+    }
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 57
-        versionName libraryVersion
+        targetSdkVersion 29
+        versionCode 58
+        versionName version
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -64,90 +91,8 @@ android {
 }
 
 dependencies {
-    api 'com.google.zxing:core:3.3.3'
-    api 'androidx.annotation:annotation:1.0.0'
+    api 'com.google.zxing:core:3.4.0'
+    api 'androidx.annotation:annotation:1.1.0'
 }
 
-group = publishedGroupId
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                groupId publishedGroupId
-                artifactId artifact
-                name libraryName
-                description libraryDescription
-                url siteUrl
-
-                licenses {
-                    license {
-                        name licenseName
-                    }
-                }
-
-                developers {
-                    developer {
-                        id developerId
-                        name developerName
-                        email developerEmail
-                    }
-                }
-
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-version = libraryVersion
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    failOnError = false
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.getDestinationDir()
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
-    configurations = ['archives']
-
-    pkg {
-        repo = bintrayRepo
-        name = bintrayName
-        desc = libraryDescription
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = allLicenses
-        publish = true
-
-        version {
-            desc = libraryDescription
-            vcsTag = 'v' + libraryVersion
-        }
-    }
-}
+apply from: 'scripts/minter_publish.gradle'
