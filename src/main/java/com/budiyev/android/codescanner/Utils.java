@@ -221,11 +221,7 @@ final class Utils {
         if (parameters.isZoomSupported()) {
             if (parameters.getZoom() != zoom) {
                 final int maxZoom = parameters.getMaxZoom();
-                if (zoom <= maxZoom) {
-                    parameters.setZoom(zoom);
-                } else {
-                    parameters.setZoom(maxZoom);
-                }
+                parameters.setZoom(Math.min(zoom, maxZoom));
             }
         }
     }
