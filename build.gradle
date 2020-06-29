@@ -68,7 +68,7 @@ ext {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         minSdkVersion 19
@@ -87,6 +87,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+        }
     }
 }
 
@@ -95,4 +98,4 @@ dependencies {
     api 'androidx.annotation:annotation:1.1.0'
 }
 
-apply from: 'scripts/minter_publish.gradle'
+apply from: 'scripts/maven_publish.gradle'
